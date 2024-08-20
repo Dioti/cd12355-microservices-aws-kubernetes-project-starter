@@ -5,26 +5,34 @@ The Coworking Space Service is a set of APIs that enables users to request one-t
 
 ## Table of Contents
 1. [Pre-requisites](#prequisites)
+    * [Requirements](#requirements)
+    * [Set up a Kubernetes cluster with Amazon EKS and eksctl](#eks)
+    * [Set up a PostgreSQL database](#postgresql)
 2. [Building the application](#building)
+    * [Clone the repository](#cloning)
+    * [Build the Docker image](#buildimage)
+    * [Push the Docker image](#pushimage)
 3. [Running the application](#running)
 4. [Deploying the application](#deploying)
+    * [Update the deployment configuration](#updateconfig)
+    * [Deploying to Kubernetes](#deployk8s)
 5. [Troubleshooting](#troubleshooting)
 6. [Suggestions](#suggestions)
 
 ## Pre-requisites <a name="prequisites"></a>
 
-### Requirements
+### Requirements <a name="requirements"></a>
 The following tools are required to build and deploy the project:
 - [Git](https://git-scm.com/downloads)
 - [Docker](https://docs.docker.com/get-started/get-docker/)
 - A Docker registry for your images (e.g. AWS ECR)
-- A Kubernetes cluster (if not, see [Setting up a Kubernetes cluster with Amazon EKS and eksctl](#eks))
-- A running PostgreSQL database containing valid data (if not, see [Setting up a PostgreSQL database](#postgresql))
+- A Kubernetes cluster (if not, see [Set up a Kubernetes cluster with Amazon EKS and eksctl](#eks))
+- A running PostgreSQL database containing valid data (if not, see [Set up a PostgreSQL database](#postgresql))
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/) - ensure that your `kubectl` configuration file is pointed towards your Kubernetes cluster. The default location is:
     - Linux and macOS: `~/.kube/config`
     - Windows: `%USERPROFILE%\.kube\config`
 
-### Setting up a Kubernetes cluster with Amazon EKS and `eksctl` <a name="eks"></a>
+### Set up a Kubernetes cluster with Amazon EKS and `eksctl` <a name="eks"></a>
 1. Install [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and ensure it's using the correct details: `aws configure`
 2. Install [eksctl](https://eksctl.io/installation/). Make sure your IAM account has the minimum access levels stated in the installation guide.
 3. Create your cluster using `eksctl`. Modify the parameters to suit your needs:
@@ -38,7 +46,7 @@ A recommended starting instance type is a `t3.medium` as it is a general-purpose
 aws eks update-kubeconfig --name my-cluster
 ```
 
-### Setting up a PostgreSQL database <a name="postgresql"></a>
+### Set up a PostgreSQL database <a name="postgresql"></a>
 1. [Clone this repository.](#cloning)
 2. Install PostgresQL's command-line tool: [psql](https://www.postgresql.org/)
 3. Verify the database configuration in `deployment/postgresql.yaml`. Update the details to suit your needs.
@@ -69,12 +77,12 @@ PGPASSWORD="$DB_PASSWORD" psql --host 127.0.0.1 -U <DB_USERNAME> -d <DB_NAME> -p
 git clone https://github.com/Dioti/cd12355-microservices-aws-kubernetes-project-starter.git
 ```
 
-### Build the Docker image
+### Build the Docker image <a name="buildimage"></a>
 ```bash
 docker build -t <REPOSITORY-NAME>/<IMAGE-NAME>:<TAG> -f analytics/Dockerfile .
 ```
 
-### Push the Docker image
+### Push the Docker image <a name="pushimage"></a>
 ```bash
 docker push <REPOSITORY-NAME>/<IMAGE-NAME>:<TAG>
 ```
@@ -95,14 +103,14 @@ docker run \
 
 ## Deploying the application <a name="deploying"></a>
 
-### Update the deployment configuration
+### Update the deployment configuration <a name="updateconfig"></a>
 Update the database details in `deployment/dbconfig.yaml` and `deployment/dbsecret.yaml`. Kubernetes will read these properties when deploying your application, so make sure they are correct.
 
 Also update your application properties in `deployment/coworking.yaml`.
 - Ensure that your image has the tag (ideally this is incremented automatically).
 - Configure the resources (replicas, memory, cpu) to suit your needs.
 
-### Deploying to Kubernetes
+### Deploying to Kubernetes cluster <a name="deployk8s"></a>
 Deploy the changes to your Kubernetes cluster:
 ```bash
 kubectl apply -f deployment/dbconfig.yaml
@@ -131,8 +139,8 @@ kubectl logs <POD-NAME>
 
 ## Suggestions <a href="suggestions"></a>
 
-### Autoscaling
+### Autoscaling <a name="autoscaling"></a>
 Consider implementing Kubernetes Horizontal Pod Autoscaler (HPA) to help manage the deployed pods depending on the traffic. The HPA can help reduce costs by scaling down the number of pods when the application has low traffic and then scale up when the traffic increases.
 
-### Logging
+### Logging <a name="logging"></a>
 Using a logging service like AWS CloudWatch can help identify underutilized resources and reduce costs by preventing overprovisioning.
