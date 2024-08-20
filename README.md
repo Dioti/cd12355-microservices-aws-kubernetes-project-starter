@@ -41,13 +41,11 @@ aws eks update-kubeconfig --name my-cluster
 ### Setting up a PostgreSQL database <a name="postgresql"></a>
 1. [Clone this repository.](#cloning)
 2. Install PostgresQL's command-line tool: [psql](https://www.postgresql.org/)
-3. Verify the database configuration in `deployment/postgresql-deployment.yaml` and `deployment/postgresql-service.yaml`. Update the details to suit your needs.
+3. Verify the database configuration in `deployment/postgresql.yaml`. Update the details to suit your needs.
 4. Once you're happy with the details, deploy the changes with Kubernetes:
 ```bash
-kubectl apply -f pvc.yaml
-kubectl apply -f pv.yaml
-kubectl apply -f postgresql-deployment.yaml
-kubectl apply -f postgresql-service.yaml
+kubectl apply -f deployment/dbvolume.yaml
+kubectl apply -f deployment/postgresql.yaml
 ```
 5. Set up port-forwarding to the newly created database service:
 ```bash
@@ -98,7 +96,7 @@ docker run \
 ## Deploying the application <a name="deploying"></a>
 
 ### Update the deployment configuration
-Update the database details in `deployment/configmap.yaml`. Kubernetes will read these properties when deploying your application, so make sure they are correct.
+Update the database details in `deployment/dbconfig.yaml` and `deployment/dbsecret.yaml`. Kubernetes will read these properties when deploying your application, so make sure they are correct.
 
 Also update your application properties in `deployment/coworking.yaml`.
 - Ensure that your image has the tag (ideally this is incremented automatically).
@@ -107,7 +105,8 @@ Also update your application properties in `deployment/coworking.yaml`.
 ### Deploying to Kubernetes
 Deploy the changes to your Kubernetes cluster:
 ```bash
-kubectl apply -f deployment/configmap.yaml
+kubectl apply -f deployment/dbconfig.yaml
+kubectl apply -f deployment/dbsecret.yaml
 kubectl apply -f deployment/coworking.yaml
 ```
 
