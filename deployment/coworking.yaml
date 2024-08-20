@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: coworking
+  name: analytics-api
 spec:
   type: LoadBalancer
   selector:
-    service: coworking
+    service: analytics-api
   ports:
   - name: "5153"
     protocol: TCP
@@ -15,42 +15,51 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: coworking
+  name: analytics-api
   labels:
-    name: coworking
+    name: analytics-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: coworking
+      service: analytics-api
   template:
     metadata:
       labels:
-        service: coworking
+        service: analytics-api
     spec:
       containers:
-      - name: coworking
-        image: <DOCKER_IMAGE_URI_FROM_ECR>
+      - name: analytics-api
+        image: 549257863378.dkr.ecr.us-east-1.amazonaws.com/coworking-space/analytics-api:v0.0.1
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"
         livenessProbe:
           httpGet:
             path: /health_check
             port: 5153
-          initialDelaySeconds: 5
-          timeoutSeconds: 2
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          periodSeconds: 20
         readinessProbe:
           httpGet:
             path: "/readiness_check"
             port: 5153
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           timeoutSeconds: 5
+          periodSeconds: 15
         envFrom:
         - configMapRef:
-            name: <NAME OF THE ConfigMap>
+            name: db-config
         env:
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: <NAME OF THE Secret>
-              key: <THE KEY FROM Secret WHICH has THE ENCODED PASSWORD>
+              name: db-secret
+              key: DB_PASSWORD
       restartPolicy: Always
