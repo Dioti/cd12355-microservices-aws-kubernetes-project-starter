@@ -137,7 +137,7 @@ To view the application logs, you can do:
 kubectl logs <POD-NAME>
 ```
 
-## Suggestions <a href="suggestions"></a>
+## Suggestions <a name="suggestions"></a>
 
 ### Autoscaling <a name="autoscaling"></a>
 Consider implementing Kubernetes Horizontal Pod Autoscaler (HPA) to help manage the deployed pods depending on the traffic. The HPA can help reduce costs by scaling down the number of pods when the application has low traffic and then scale up when the traffic increases.
